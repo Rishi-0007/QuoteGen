@@ -5,7 +5,7 @@ import Quotation from "@/models/Quotation";
 
 export default async function Dashboard(){
   await dbConnect();
-  const quotes = await Quotation.find().sort({ createdAt: -1 }).limit(100).lean();
+  const quotes = await Quotation.find().sort({ createdAt: -1 }).limit(50).lean();
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -14,16 +14,15 @@ export default async function Dashboard(){
       </div>
       <div className="card p-0 overflow-hidden">
         <table className="table">
-          <thead><tr><th>Destination</th><th>Created</th><th>Status</th><th>PDF</th><th className="text-right pr-4">Actions</th></tr></thead>
+          <thead><tr><th>Destination</th><th>Created</th><th>Status</th><th></th></tr></thead>
           <tbody>
             {quotes.map(q=>(
               <tr key={q._id}>
                 <td>{q.destination || "-"}</td>
                 <td>{new Date(q.createdAt).toLocaleString()}</td>
-                <td><span className="badge capitalize">{q.status}</span></td>
-                <td>{q.pdfUrl ? <a href={q.pdfUrl} target="_blank" className="text-accent underline">Open</a> : "—"}</td>
-                <td className="text-right space-x-2 pr-4">
-                  <Link href={`/quotes/${q._id}`} className="btn btn-ghost">View</Link>
+                <td className="capitalize">{q.status}</td>
+                <td className="text-right">
+                  <Link href={`/quotes/${q._id}`} className="btn btn-ghost mr-2">View</Link>
                   <Link href={`/quotes/${q._id}/edit`} className="btn btn-ghost">Edit</Link>
                 </td>
               </tr>

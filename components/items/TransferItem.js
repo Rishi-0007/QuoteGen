@@ -48,7 +48,7 @@ export default function TransferItem({ index, form }) {
 
       <div className="md:col-span-2">
         <div className="label">Details</div>
-        <Input {...form.register(`items.${index}.description`)} placeholder="Seat-in-coach / Private car / vessel class etc." />
+        <Input {...form.register(`items.${index}.details`)} placeholder="Seat-in-coach / Private car / vessel class etc." />
       </div>
 
       {t === "intercity" && (

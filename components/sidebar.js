@@ -4,7 +4,6 @@ export default function Sidebar(){
   const nav=[
     {href:"/dashboard",label:"Dashboard"},
     {href:"/quotes/new",label:"New Quote"},
-    {href:"/settings",label:"Settings"},
   ];
   return (<aside className="h-screen sticky top-0 w-60 bg-surface border-r border-white/10 p-4">
     <div className="text-xl font-bold mb-4">QuoteGen</div>

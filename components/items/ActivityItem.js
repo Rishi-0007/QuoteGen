@@ -15,11 +15,11 @@ export default function ActivityItem({ index, form }) {
     <div className="grid md:grid-cols-4 gap-3">
       <div className="md:col-span-2">
         <div className="label">Activity Name</div>
-        <Input {...form.register(`items.${index}.supplierName`)} placeholder="e.g., Mahe Island Discovery Tour" />
+        <Input {...form.register(`items.${index}.itemTitle`)} placeholder="e.g., Mahe Island Discovery Tour" />
       </div>
       <div className="md:col-span-2">
         <div className="label">Details</div>
-        <Input {...form.register(`items.${index}.description`)} placeholder="Shared tour / 2 Adults" />
+        <Input {...form.register(`items.${index}.description`)} placeholder="Seat in coach / timing / add-ons" />
       </div>
       <div>
         <div className="label">Date</div>
@@ -41,6 +41,7 @@ export default function ActivityItem({ index, form }) {
         <div className="label">Total (auto)</div>
         <Input type="number" step="0.01" {...form.register(`items.${index}.totalPrice`)} />
       </div>
+
       <div className="md:col-span-2">
         <div className="label">Cancellation Policy</div>
         <div className="grid grid-cols-2 gap-2">

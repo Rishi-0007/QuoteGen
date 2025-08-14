@@ -6,27 +6,44 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
-import HotelItem from "@/components/items/HotelItem";
+import AccommodationItem from "@/components/items/AccommodationItem";
 import TransferItem from "@/components/items/TransferItem";
 import ActivityItem from "@/components/items/ActivityItem";
 import CurrencySelect from "@/components/ui/currency-select";
-import { useEffect } from "react";
 
 const ItemSchema = z.object({
   type: z.string().optional(),
+
+  // accommodation
+  island: z.string().optional(),
+  hotelProperty: z.string().optional(),
+  roomCount: z.coerce.number().optional(),
+  roomDetails: z.string().optional(),
+  adults: z.coerce.number().optional(),
+  children: z.coerce.number().optional(),
+  guests: z.coerce.number().optional(),
+  checkIn: z.string().optional(),
+  checkOut: z.string().optional(),
+
+  // transfer
   transferType: z.string().optional(),
-  supplierName: z.string().optional(),
-  roomType: z.string().optional(),
-  description: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
+  details: z.string().optional(),
   members: z.coerce.number().optional(),
+
+  // activity
+  itemTitle: z.string().optional(),
+  description: z.string().optional(),
+  startDate: z.string().optional(),
+
+  // pricing
   currency: z.string().optional(),
   basePrice: z.coerce.number().optional(),
   markupPercent: z.coerce.number().optional(),
   totalPrice: z.coerce.number().optional(),
+
+  // cancellation
   cancellationBefore: z.string().optional(),
 });
 
@@ -45,10 +62,10 @@ const QuoteSchema = z.object({
 });
 
 export default function QuoteForm({ initial }){
-  const form = useForm({ resolver: zodResolver(QuoteSchema), defaultValues: initial || { currency: "INR", items: [], footerBrand: "holidays_seychelle", status: "draft" } });
+  const form = useForm({ resolver: zodResolver(QuoteSchema), defaultValues: initial || { currency: "INR", items: [], footerBrand: "holidays_seychelle" } });
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" });
 
-  function addHotel(){ append({ type: "hotel", currency: form.getValues("currency") || "INR" }); }
+  function addAccommodation(){ append({ type: "accommodation", island: "mahe", currency: form.getValues("currency") || "INR" }); }
   function addTransfer(){ append({ type: "transfer", transferType: "airport", currency: form.getValues("currency") || "INR" }); }
   function addActivity(){ append({ type: "activity", currency: form.getValues("currency") || "INR" }); }
 
@@ -62,8 +79,6 @@ export default function QuoteForm({ initial }){
     const discount = Number(form.getValues("discount") || 0);
     form.setValue("grandTotal", Math.max(0, subtotal - discount));
   }
-
-  useEffect(()=>{ computeTotals(); }, [form.watch("items"), form.watch("discount")]);
 
   async function onSubmit(values){
     computeTotals();
@@ -80,7 +95,7 @@ export default function QuoteForm({ initial }){
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <Card>
         <div className="grid md:grid-cols-4 gap-4">
-          <div><div className="label">Destination</div><Input {...form.register("destination")} placeholder="e.g., Seychelles / Oman" /></div>
+          <div><div className="label">Destination</div><Input {...form.register("destination")} placeholder="e.g., Seychelles" /></div>
           <div><div className="label">Start</div><Input type="date" {...form.register("travelStart")} /></div>
           <div><div className="label">End</div><Input type="date" {...form.register("travelEnd")} /></div>
           <CurrencySelect value={form.watch("currency")} onChange={(v)=> form.setValue("currency", v)} />
@@ -92,25 +107,18 @@ export default function QuoteForm({ initial }){
               <option value="sunrise_journeys">Sunrise Journeys (dummy)</option>
             </select>
           </div>
-          <div>
-            <div className="label">Status</div>
-            <select className="input" {...form.register("status")}>
-              <option value="draft">Draft</option>
-              <option value="final">Final</option>
-            </select>
-          </div>
         </div>
       </Card>
 
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <div className="text-lg font-semibold">Hotels</div>
-          <Button type="button" onClick={addHotel}>Add Hotel</Button>
+          <div className="section-title">Accommodation</div>
+          <Button type="button" onClick={addAccommodation}>Add Accommodation</Button>
         </div>
         <div className="space-y-4">
-          {fields.map((f, i) => f.type === "hotel" && (
+          {fields.map((f, i) => f.type === "accommodation" && (
             <div key={f.id} className="border border-white/10 rounded-2xl p-4">
-              <HotelItem index={i} form={form} />
+              <AccommodationItem index={i} form={form} />
               <div className="flex justify-between mt-3">
                 <div className="text-white/60">Item #{i+1}</div>
                 <Button type="button" variant="ghost" onClick={()=> remove(i)}>Remove</Button>
@@ -122,7 +130,7 @@ export default function QuoteForm({ initial }){
 
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <div className="text-lg font-semibold">Transfers</div>
+          <div className="section-title">Transfers</div>
           <Button type="button" onClick={addTransfer}>Add Transfer</Button>
         </div>
         <div className="space-y-4">
@@ -140,7 +148,7 @@ export default function QuoteForm({ initial }){
 
       <Card>
         <div className="flex items-center justify-between mb-3">
-          <div className="text-lg font-semibold">Activities</div>
+          <div className="section-title">Activities</div>
           <Button type="button" onClick={addActivity}>Add Activity</Button>
         </div>
         <div className="space-y-4">
@@ -161,6 +169,12 @@ export default function QuoteForm({ initial }){
           <div><div className="label">Subtotal</div><Input type="number" step="0.01" {...form.register("subtotal")} /></div>
           <div><div className="label">Discount</div><Input type="number" step="0.01" {...form.register("discount", { onChange: computeTotals })} /></div>
           <div><div className="label">Grand Total</div><Input type="number" step="0.01" {...form.register("grandTotal")} /></div>
+          <div><div className="label">Status</div>
+            <select className="input" {...form.register("status")}>
+              <option value="draft">Draft</option>
+              <option value="final">Final</option>
+            </select>
+          </div>
           <div className="md:col-span-4">
             <div className="label">Notes</div>
             <Input {...form.register("notes")} placeholder="Any general notes…" />
@@ -170,6 +184,7 @@ export default function QuoteForm({ initial }){
 
       <div className="flex gap-3">
         <Button type="submit" onClick={computeTotals}>Save</Button>
+        <Button type="button" variant="ghost" onClick={computeTotals}>Recalculate</Button>
       </div>
     </form>
   );

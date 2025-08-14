@@ -11,8 +11,7 @@ html, body { @apply bg-background text-white; }
 .btn { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 font-medium transition; }
 .btn-primary { @apply bg-accent/90 hover:bg-accent text-black; }
 .btn-ghost { @apply bg-white/5 hover:bg-white/10; }
-.table { @apply w-full text-sm; border-collapse: collapse; }
+.table { @apply w-full text-sm; }
 .table th { @apply text-left font-semibold text-white/70 py-2; }
 .table td { @apply py-3 border-t border-white/10; }
-.badge { @apply text-xs px-2 py-0.5 rounded bg-white/10 border border-white/10; }
-hr.sep { @apply border-white/10 my-4; }
+.section-title { @apply text-lg font-semibold mb-3; }

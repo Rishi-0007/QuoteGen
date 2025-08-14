@@ -2,21 +2,30 @@
 import mongoose from "mongoose";
 
 const ItemSchema = new mongoose.Schema({
-  type: { type: String, enum: ["hotel","transfer","activity","other"], default: "other" },
+  type: { type: String, enum: ["accommodation","transfer","activity","other"], default: "other" },
 
-  // Common / hotel / activity
-  supplierName: String, // hotel name or activity name
-  itemTitle: String,
-  roomType: String,
-  description: String, // details
-  startDate: Date,
-  endDate: Date,
+  // Accommodation
+  island: String,                   // mahe | praslin | ladigue
+  hotelProperty: String,            // full string from PROPERTIES list
+  roomCount: Number,
+  roomDetails: String,              // e.g., Deluxe Room with Sea View
+  adults: Number,
+  children: Number,
+  guests: Number,
+  checkIn: Date,                    // startDate alias
+  checkOut: Date,                   // endDate alias
 
   // Transfer
   transferType: { type: String, enum: ["airport","intercity","ferry"] },
   from: String,
   to: String,
+  details: String,
   members: Number,
+
+  // Activity
+  itemTitle: String,
+  description: String,
+  startDate: Date,
 
   // Pricing
   currency: { type: String, default: "INR" },
@@ -30,6 +39,7 @@ const ItemSchema = new mongoose.Schema({
 
 const QuotationSchema = new mongoose.Schema({
   currency: { type: String, default: "INR" },
+
   destination: String,
   travelStart: Date,
   travelEnd: Date,
@@ -48,7 +58,6 @@ const QuotationSchema = new mongoose.Schema({
 
   status: { type: String, enum: ["draft","final"], default: "draft" },
   notes: String,
-  pdfUrl: String,
 }, { timestamps: true });
 
 export default mongoose.models.Quotation || mongoose.model("Quotation", QuotationSchema);
