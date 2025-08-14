@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@/components/ui/input";
 import Button from "@/components/ui/button";
 import Card from "@/components/ui/card";
+import Textarea from "@/components/ui/textarea";
 import AccommodationItem from "@/components/items/AccommodationItem";
 import TransferItem from "@/components/items/TransferItem";
 import ActivityItem from "@/components/items/ActivityItem";
@@ -13,8 +14,6 @@ import CurrencySelect from "@/components/ui/currency-select";
 
 const ItemSchema = z.object({
   type: z.string().optional(),
-
-  // accommodation
   island: z.string().optional(),
   hotelProperty: z.string().optional(),
   roomCount: z.coerce.number().optional(),
@@ -24,53 +23,45 @@ const ItemSchema = z.object({
   guests: z.coerce.number().optional(),
   checkIn: z.string().optional(),
   checkOut: z.string().optional(),
-
-  // transfer
   transferType: z.string().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
   details: z.string().optional(),
   members: z.coerce.number().optional(),
-
-  // activity
   itemTitle: z.string().optional(),
   description: z.string().optional(),
   startDate: z.string().optional(),
-
-  // pricing
   currency: z.string().optional(),
   basePrice: z.coerce.number().optional(),
   markupPercent: z.coerce.number().optional(),
   totalPrice: z.coerce.number().optional(),
-
-  // cancellation
   cancellationBefore: z.string().optional(),
 });
 
 const QuoteSchema = z.object({
-  destination: z.string().optional(),
-  travelStart: z.string().optional(),
-  travelEnd: z.string().optional(),
   currency: z.string().optional().default("INR"),
   items: z.array(ItemSchema).optional(),
   subtotal: z.coerce.number().optional(),
   discount: z.coerce.number().optional(),
   grandTotal: z.coerce.number().optional(),
-  notes: z.string().optional(),
   status: z.string().optional(),
   footerBrand: z.string().optional(),
+  notesPreset: z.string().optional().default("default"),
+  notesCustom: z.string().optional(),
 });
 
 export default function QuoteForm({ initial }){
-  const form = useForm({ resolver: zodResolver(QuoteSchema), defaultValues: initial || { currency: "INR", items: [], footerBrand: "holidays_seychelle" } });
+  const form = useForm({ resolver: zodResolver(QuoteSchema), defaultValues: { currency: "INR", footerBrand:"holidays_seychelle", notesPreset:"default", notesCustom:"", ...(initial||{}) } });
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" });
 
-  function addAccommodation(){ append({ type: "accommodation", island: "mahe", currency: form.getValues("currency") || "INR" }); }
-  function addTransfer(){ append({ type: "transfer", transferType: "airport", currency: form.getValues("currency") || "INR" }); }
-  function addActivity(){ append({ type: "activity", currency: form.getValues("currency") || "INR" }); }
+  function addAccommodation(){ append({ type: "accommodation", island: "mahe" }); }
+  function addTransfer(){ append({ type: "transfer", transferType: "airport" }); }
+  function addActivity(){ append({ type: "activity" }); }
 
   function computeTotals(){
     const items = form.getValues("items") || [];
+    const globalCur = form.getValues("currency") || "INR";
+    items.forEach((it, i) => form.setValue(`items.${i}.currency`, globalCur));
     const subtotal = items.reduce((sum, it) => {
       const t = Number(it.totalPrice ?? (Number(it.basePrice || 0) * (1 + Number(it.markupPercent || 0)/100)));
       return sum + (isFinite(t) ? t : 0);
@@ -78,6 +69,12 @@ export default function QuoteForm({ initial }){
     form.setValue("subtotal", +subtotal.toFixed(2));
     const discount = Number(form.getValues("discount") || 0);
     form.setValue("grandTotal", Math.max(0, subtotal - discount));
+  }
+
+  function onCurrencyChange(v){
+    form.setValue("currency", v);
+    const items = form.getValues("items") || [];
+    items.forEach((_, i) => form.setValue(`items.${i}.currency`, v));
   }
 
   async function onSubmit(values){
@@ -95,18 +92,7 @@ export default function QuoteForm({ initial }){
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <Card>
         <div className="grid md:grid-cols-4 gap-4">
-          <div><div className="label">Destination</div><Input {...form.register("destination")} placeholder="e.g., Seychelles" /></div>
-          <div><div className="label">Start</div><Input type="date" {...form.register("travelStart")} /></div>
-          <div><div className="label">End</div><Input type="date" {...form.register("travelEnd")} /></div>
-          <CurrencySelect value={form.watch("currency")} onChange={(v)=> form.setValue("currency", v)} />
-          <div className="md:col-span-2">
-            <div className="label">Footer / Brand</div>
-            <select className="input" {...form.register("footerBrand")}>
-              <option value="holidays_seychelle">Holidays Seychelle</option>
-              <option value="oceanic_travel">Oceanic Travel Co. (dummy)</option>
-              <option value="sunrise_journeys">Sunrise Journeys (dummy)</option>
-            </select>
-          </div>
+          <CurrencySelect value={form.watch("currency")} onChange={onCurrencyChange} />
         </div>
       </Card>
 
@@ -175,10 +161,37 @@ export default function QuoteForm({ initial }){
               <option value="final">Final</option>
             </select>
           </div>
-          <div className="md:col-span-4">
-            <div className="label">Notes</div>
-            <Input {...form.register("notes")} placeholder="Any general notes…" />
-          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="section-title">Notes</div>
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2">
+            <input type="radio" value="default" {...form.register("notesPreset")} defaultChecked={form.getValues("notesPreset")!=="custom"} />
+            <span>Use default important notes</span>
+          </label>
+          <label className="flex items-center gap-2">
+            <input type="radio" value="custom" {...form.register("notesPreset")} />
+            <span>Provide custom notes</span>
+          </label>
+        </div>
+        <div className="mt-3">
+          <div className="label">Custom notes (markdown or bullet lines)</div>
+          <Textarea placeholder="Enter custom notes here..." {...form.register("notesCustom")} />
+          <div className="text-white/50 text-xs mt-1">Tip: Use lines starting with * or - for bullets.</div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="section-title">Document Footer</div>
+        <div className="md:w-1/2">
+          <div className="label">Footer / Brand</div>
+          <select className="input" {...form.register("footerBrand")}>
+            <option value="holidays_seychelle">Holidays Seychelle</option>
+            <option value="oceanic_travel">Oceanic Travel Co. (dummy)</option>
+            <option value="sunrise_journeys">Sunrise Journeys (dummy)</option>
+          </select>
         </div>
       </Card>
 

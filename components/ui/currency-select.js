@@ -2,13 +2,11 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
 import Input from "./input";
-
 const CURRENCIES = [
   ["INR","Indian Rupee"],["EUR","Euro"],["USD","US Dollar"],["OMR","Omani Rial"],
   ["AED","UAE Dirham"],["GBP","Pound Sterling"],["SGD","Singapore Dollar"],
   ["THB","Thai Baht"],["LKR","Sri Lankan Rupee"],["MUR","Mauritian Rupee"]
 ];
-
 export default function CurrencySelect({ value, onChange, placeholder="Search currency…" }){
   const [query,setQuery]=useState(""); const [open,setOpen]=useState(false);
   useEffect(()=>{ if(!value) onChange?.("INR"); },[value,onChange]);
@@ -19,7 +17,7 @@ export default function CurrencySelect({ value, onChange, placeholder="Search cu
   const selected = CURRENCIES.find(([c])=>c===value);
   return (
     <div className="relative">
-      <div className="label">Currency</div>
+      <div className="label">Global Currency</div>
       <Input onFocus={()=>setOpen(true)} value={selected?`${selected[0]} — ${selected[1]}`:query}
              onChange={e=>setQuery(e.target.value)} placeholder={placeholder}/>
       {open&&(

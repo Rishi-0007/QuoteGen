@@ -1,9 +1,7 @@
 
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
 const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
 export async function middleware(req) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get("token")?.value;
@@ -13,5 +11,4 @@ export async function middleware(req) {
   try { await jwtVerify(token, secret); return NextResponse.next(); }
   catch { url.pathname = "/login"; return NextResponse.redirect(url); }
 }
-
 export const config = { matcher: ["/((?!_next|favicon.ico|api/auth|images|public).*)"] };
