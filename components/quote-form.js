@@ -241,7 +241,7 @@ export default function QuoteForm({ initial }) {
           <div className="label">Footer / Brand</div>
           <select className="input" {...form.register("footerBrand")}>
             <option value="holidays_seychelle">Holidays Seychelle</option>
-            <option value="oceanic_travel">Oceanic Travel Co. (dummy)</option>
+            <option value="oceanic_travel">Traveon</option>
             <option value="sunrise_journeys">Sunrise Journeys (dummy)</option>
           </select>
         </div>

@@ -57,7 +57,7 @@ export default async function QuoteView({ params }) {
       </div>
 
       {/* NEW: Agent Details preview */}
-      <div className="card">
+      <div className="card p-6">
         <div className="text-lg font-semibold mb-2">Agent Details</div>
         <div className="grid md:grid-cols-4 gap-2 text-sm">
           <div className="text-white/70">Contact Person</div><div>{agent.name}</div>
@@ -67,7 +67,7 @@ export default async function QuoteView({ params }) {
         </div>
       </div>
 
-      <div className="card p-0 overflow-hidden">
+      <div className="card p-6 overflow-hidden">
         <table className="table">
           <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
           <tbody>
