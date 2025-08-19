@@ -43,7 +43,7 @@ const QuotationSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   grandTotal: { type: Number, default: 0 },
   footerBrand: { type: String, enum: ["holidays_seychelle", "oceanic_travel", "sunrise_journeys"], default: "holidays_seychelle" },
-  notesPreset: { type: String, enum: ["default", "custom"], default: "default" },
+  notesPreset: { type: String, enum: ["custom", "custom"], default: "custom" },
   notesCustom: { type: String, default: "" },
   status: { type: String, enum: ["draft", "final"], default: "draft" },
 }, { timestamps: true });

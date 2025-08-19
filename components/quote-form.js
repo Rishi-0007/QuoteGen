@@ -52,7 +52,7 @@ const QuoteSchema = z.object({
   grandTotal: z.coerce.number().optional(),
   status: z.string().optional(),
   footerBrand: z.string().optional(),
-  notesPreset: z.string().optional().default("default"),
+  notesPreset: z.string().optional().default("custom"),
   notesCustom: z.string().optional(),
 });
 
@@ -62,7 +62,7 @@ export default function QuoteForm({ initial }) {
     defaultValues: {
       currency: initial?.currency ?? "INR",
       footerBrand: initial?.footerBrand ?? "holidays_seychelle",
-      notesPreset: initial?.notesPreset ?? "default",
+      notesPreset: initial?.notesPreset ?? "custom",
       notesCustom: initial?.notesCustom ?? "",
 
       agentName: initial?.agentName ?? AGENT_DEFAULT.name,
@@ -216,25 +216,15 @@ export default function QuoteForm({ initial }) {
 
       {/* 7) Notes */}
       <Card>
-        <div className="section-title">Notes</div>
-        <div className="flex gap-6">
-          <label className="flex items-center gap-2">
-            <input type="radio" value="default" {...form.register("notesPreset")} defaultChecked />
-            <span>Use default important notes</span>
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="radio" value="custom" {...form.register("notesPreset")} />
-            <span>Provide custom notes</span>
-          </label>
-        </div>
-        <div className="mt-3">
-          <div className="label">Custom notes (markdown or bullet lines)</div>
-          <Textarea placeholder="Enter custom notes here..." {...form.register("notesCustom")} />
-          <div className="text-white/50 text-xs mt-1">Tip: Use lines starting with * or - for bullets.</div>
+        <div className="section-title">Important Notes</div>
+        <div className="mt-2">
+          <div className="label">Enter important notes (Markdown supported)</div>
+          <Textarea placeholder="Write notes in Markdown (headings, lists, **bold**, _italic_)..." {...form.register("notesCustom")} />
+          <div className="text-white/50 text-xs mt-1">Tip: Supports headings (#), bulleted (-, *), numbered (1.), **bold**, _italic_, tables, and more.</div>
         </div>
       </Card>
 
-      {/* 8) Footer / Brand */}
+      {/* 8) Footer / Brand */}{/* 8) Footer / Brand */}
       <Card>
         <div className="section-title">Document Footer</div>
         <div className="md:w-1/2">
