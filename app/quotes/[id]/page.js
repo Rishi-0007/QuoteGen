@@ -21,30 +21,84 @@ export default async function QuoteView({ params }) {
     subject: quote.agentSubject || AGENT_DEFAULT.subject,
   };
 
-  const items = (quote.items || []).map((it) => {
+  const allItems = (quote.items || []).slice();
+  function ts(v) { try { return v ? new Date(v).getTime() : 0; } catch (e) { return 0; } }
+
+  const acc = allItems.filter(it => it.type === "accommodation").map(it => {
     const cur = it.currency || quote.currency || "INR";
     const total = it.totalPrice ?? (Number(it.basePrice || 0) * (1 + Number(it.markupPercent || 0) / 100));
+    const { name, location } = splitHotelAndLocation(it.hotelProperty || "");
+    const rn = it.roomCount ? `${it.roomCount} x` : "";
+    const pax = [(it.adults || it.adults === 0) ? `${it.adults} Adults` : null, (it.children || it.children === 0) ? `${it.children} Children` : null, (it.guests || it.guests === 0) ? `${it.guests} Guests` : null].filter(Boolean).join(", ");
+    const details = [location ? `(${location})` : "", [rn, it.roomDetails].filter(Boolean).join(" "), pax].filter(Boolean).join(" — ");
+    return {
+      _sort: ts(it.checkIn || it.startDate),
+      name: name || "Hotel",
+      details,
+      date: `${it.checkIn ? new Date(it.checkIn).toLocaleDateString() : ""}${it.checkOut ? " - " + new Date(it.checkOut).toLocaleDateString() : ""}`,
+      price: formatMoney(total, cur),
+    };
+  }).sort((a, b) => a._sort - b._sort);
+
+  const trf = allItems.filter(it => it.type === "transfer").map(it => {
+    const cur = it.currency || quote.currency || "INR";
+    const total = it.totalPrice ?? (Number(it.basePrice || 0) * (1 + Number(it.markupPercent || 0) / 100));
+    const label = it.transferType === "ferry" ? "Ferry Transfer" : it.transferType === "intercity" ? "Intercity Transfer" : "Airport Transfer";
+    const name = `${label}${it.details ? " - " + it.details : ""}`.trim();
+    const details = `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`;
+    return {
+      _sort: ts(it.startDate),
+      name,
+      details,
+      date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "",
+      price: formatMoney(total, cur),
+    };
+  }).sort((a, b) => a._sort - b._sort);
+
+  const act = allItems.filter(it => it.type === "activity").map(it => {
+    const cur = it.currency || quote.currency || "INR";
+    const total = it.totalPrice ?? (Number(it.basePrice || 0) * (1 + Number(it.markupPercent || 0) / 100));
+
     if (it.type === "accommodation") {
       const { name, location } = splitHotelAndLocation(it.hotelProperty || "");
       const rn = it.roomCount ? `${it.roomCount} x` : "";
       const pax = [(it.adults || it.adults === 0) ? `${it.adults} Adults` : null, (it.children || it.children === 0) ? `${it.children} Children` : null, (it.guests || it.guests === 0) ? `${it.guests} Guests` : null].filter(Boolean).join(", ");
       return {
+        _sort: ts(it.checkIn || it.startDate),
         name: name || "Hotel",
         details: [location ? `(${location})` : "", [rn, it.roomDetails].filter(Boolean).join(" "), pax].filter(Boolean).join(" — "),
-        date: `${it.checkIn ? new Date(it.checkIn).toLocaleDateString() : ""} - ${it.checkOut ? new Date(it.checkOut).toLocaleDateString() : ""}`,
+        date: `${it.checkIn ? new Date(it.checkIn).toLocaleDateString() : ""}${it.checkOut ? " - " + new Date(it.checkOut).toLocaleDateString() : ""}`,
         price: formatMoney(total, cur),
       };
     } else if (it.type === "transfer") {
       const label = it.transferType === "ferry" ? "Ferry Transfer" : it.transferType === "intercity" ? "Intercity Transfer" : "Airport Transfer";
-      return { name: `${label}${it.details ? " - " + it.details : ""}`.trim(), details: `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`, date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "", price: formatMoney(total, cur) };
+      return {
+        _sort: ts(it.startDate),
+        name: `${label}${it.details ? " - " + it.details : ""}`.trim(),
+        details: `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`,
+        date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "",
+        price: formatMoney(total, cur)
+      };
     } else if (it.type === "activity") {
       const fromTo = (it.startTime || it.endTime) ? `From ${it.startTime || "--"} to ${it.endTime || "--"}` : "";
       const mergedDetails = [it.description || "", fromTo].filter(Boolean).join(" — ");
-      return { name: it.itemTitle || it.customActivity || "Activity", details: mergedDetails, date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "", price: formatMoney(total, cur) };
+      return {
+        _sort: ts(it.startDate),
+        name: it.itemTitle || it.customActivity || "Activity",
+        details: mergedDetails,
+        date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "",
+        price: formatMoney(total, cur)
+      };
     } else {
-      return { name: it.itemTitle || "Service", details: it.description || "", date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "", price: formatMoney(total, cur) };
+      return {
+        _sort: ts(it.startDate),
+        name: it.itemTitle || "Service",
+        details: it.description || "",
+        date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "",
+        price: formatMoney(total, cur)
+      };
     }
-  });
+  }).sort((a, b) => a._sort - b._sort);
 
   return (
     <div className="space-y-6">
@@ -67,34 +121,79 @@ export default async function QuoteView({ params }) {
         </div>
       </div>
 
-      <div className="card p-6 overflow-hidden">
-        <table className="table">
-          <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
-          <tbody>
-            {items.map((r, idx) => (
-              <tr key={idx}>
-                <td>{r.name}</td>
-                <td className="text-white/80">{r.details}</td>
-                <td>{r.date}</td>
-                <td className="text-right">{r.price}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={3} className="text-right">Subtotal</td>
-              <td className="text-right">{formatMoney(quote.subtotal, quote.currency || "INR")}</td>
-            </tr>
-            <tr>
-              <td colSpan={3} className="text-right">Total Discount</td>
-              <td className="text-right">-{formatMoney(quote.discount, quote.currency || "INR")}</td>
-            </tr>
-            <tr>
-              <td colSpan={3} className="text-right font-semibold">Grand Total</td>
-              <td className="text-right font-semibold">{formatMoney(quote.grandTotal, quote.currency || "INR")}</td>
-            </tr>
-          </tfoot>
-        </table>
+      <div className="card p-6 overflow-hidden space-y-6">
+
+        {acc.length > 0 && (
+          <div>
+            <div className="text-lg font-semibold mb-2">Accommodation</div>
+            <table className="table w-full">
+              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              <tbody>
+                {acc.map((r, idx) => (
+                  <tr key={`acc-${idx}`}>
+                    <td>{r.name}</td>
+                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.date}</td>
+                    <td className="text-right">{r.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {trf.length > 0 && (
+          <div>
+            <div className="text-lg font-semibold mb-2">Transfers</div>
+            <table className="table w-full">
+              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              <tbody>
+                {trf.map((r, idx) => (
+                  <tr key={`trf-${idx}`}>
+                    <td>{r.name}</td>
+                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.date}</td>
+                    <td className="text-right">{r.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {act.length > 0 && (
+          <div>
+            <div className="text-lg font-semibold mb-2">Activities</div>
+            <table className="table w-full">
+              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              <tbody>
+                {act.map((r, idx) => (
+                  <tr key={`act-${idx}`}>
+                    <td>{r.name}</td>
+                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.date}</td>
+                    <td className="text-right">{r.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={3} className="text-right">Subtotal</td>
+                  <td className="text-right">{formatMoney(quote.subtotal, quote.currency || "INR")}</td>
+                </tr>
+                <tr>
+                  <td colSpan={3} className="text-right">Total Discount</td>
+                  <td className="text-right">-{formatMoney(quote.discount, quote.currency || "INR")}</td>
+                </tr>
+                <tr>
+                  <td colSpan={3} className="text-right font-semibold">Grand Total</td>
+                  <td className="text-right font-semibold">{formatMoney(quote.grandTotal, quote.currency || "INR")}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
+
       </div>
     </div>
   );
