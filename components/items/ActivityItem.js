@@ -7,19 +7,19 @@ import { useMemo } from "react";
 
 const ACTIVITY_MAP = {
   mahe: [
-    "Private Charter - Zephir","Group Outing","Tour Guiding","Sunset on the Rocks at Cap Lazare Nature Reserve","Visit Craft Village","Gallery Domaine",
-    "Mahe Island Discovery Shared Tour","Island tour","Ste Anne Marine Park (Day trip)","Private Charter Zekler","Nature Trail - Copolia","Sunseekers Tours",
-    "Private Full Day Island Tours","Discovery Tour of Mahe - Without Guide (Full Day)","Discovery Tour of Mahe - Without Guide (Half Day)","Sun Strokes Art Tour"
+    "Private Charter - Zephir", "Group Outing", "Tour Guiding", "Sunset on the Rocks at Cap Lazare Nature Reserve", "Visit Craft Village", "Gallery Domaine",
+    "Mahe Island Discovery Shared Tour", "Island tour", "Ste Anne Marine Park (Day trip)", "Private Charter Zekler", "Nature Trail - Copolia", "Sunseekers Tours",
+    "Private Full Day Island Tours", "Discovery Tour of Mahe - Without Guide (Full Day)", "Discovery Tour of Mahe - Without Guide (Half Day)", "Sun Strokes Art Tour"
   ],
   praslin: [
-    "Vallee De Mai (World Heritage site)","La Digue Island Boat & Bike","Curieuse and St Pierre Islands","Nature Trail - Fond Ferdinand",
-    "Discovery Tour of Praslin Island - Without Guide (Half Day)","Discovery Tour of Praslin Island - Without Guide (Full Day)","Private Charter Catamaran Oplezir",
-    "Curieuse & St Pierre Glass Bottom Boat trip and Snorkeling","Praslin Island Discovery Shared Tour"
+    "Vallee De Mai (World Heritage site)", "La Digue Island Boat & Bike", "Curieuse and St Pierre Islands", "Nature Trail - Fond Ferdinand",
+    "Discovery Tour of Praslin Island - Without Guide (Half Day)", "Discovery Tour of Praslin Island - Without Guide (Full Day)", "Private Charter Catamaran Oplezir",
+    "Curieuse & St Pierre Glass Bottom Boat trip and Snorkeling", "Praslin Island Discovery Shared Tour"
   ],
   ladigue: [
-    "La Digue Island Boat & Bike (From Mahe Island)","La Digue Island Boat & Bike (From Praslin Island)","Coco, Sister & Felicite islands",
-    "Coco & Felicite Islands (From La Digue)","Curieuse and St Pierre Islands","La Digue Island Discovery Shared Tour","Gesima Combo","Ile de Palmes Discovery",
-    "Just Married","Discovery of Turtle Island","Reef Classico"
+    "La Digue Island Boat & Bike (From Mahe Island)", "La Digue Island Boat & Bike (From Praslin Island)", "Coco, Sister & Felicite islands",
+    "Coco & Felicite Islands (From La Digue)", "Curieuse and St Pierre Islands", "La Digue Island Discovery Shared Tour", "Gesima Combo", "Ile de Palmes Discovery",
+    "Just Married", "Discovery of Turtle Island", "Reef Classico", "Half Day La Digue Excursion (Afternoon)"
   ]
 };
 
