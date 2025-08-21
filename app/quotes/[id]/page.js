@@ -147,13 +147,18 @@ export default async function QuoteView({ params }) {
     }
   }).sort((a, b) => a._sort - b._sort);
 
+  // Normalize identifiers and timestamps to primitives to be safe for client usage
+  const quoteIdStr = quote._id?.toString();
+  const createdAtStr = quote.createdAt ? new Date(quote.createdAt).toISOString() : undefined;
+  const updatedAtStr = quote.updatedAt ? new Date(quote.updatedAt).toISOString() : undefined;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Quotation</h1>
         <div className="flex gap-2">
-          <GeneratePdfButton id={quote._id.toString()} />
-          <Link className="btn btn-primary" href={`/quotes/${quote._id}/edit`}>Edit</Link>
+          <GeneratePdfButton id={quoteIdStr} />
+          <Link className="btn btn-primary" href={`/quotes/${quoteIdStr}/edit`}>Edit</Link>
         </div>
       </div>
 
