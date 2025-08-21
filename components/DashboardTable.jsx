@@ -27,7 +27,8 @@ export default function DashboardTable({ rows }) {
 
   return (
     <div className="relative">
-      <table className="table w-full">
+      <div className="table-wrap">
+<table className="table w-full">
         <thead>
           <tr>
             <th>Name</th>
@@ -56,6 +57,7 @@ export default function DashboardTable({ rows }) {
           ))}
         </tbody>
       </table>
+</div>
 
       {/* Simple confirmation dialog (shadcn-like styling) */}
       {confirmId && (

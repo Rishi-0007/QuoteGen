@@ -181,7 +181,8 @@ export default async function QuoteView({ params }) {
         {acc.length > 0 && (
           <div>
             <div className="text-lg font-semibold mb-2">Accommodation</div>
-            <table className="table w-full">
+            <div className="table-wrap">
+<table className="table w-full">
               {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {acc.map((r, idx) => (
@@ -194,13 +195,15 @@ export default async function QuoteView({ params }) {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
         )}
 
         {trf.length > 0 && (
           <div>
             <div className="text-lg font-semibold mb-2">Transfers</div>
-            <table className="table w-full">
+            <div className="table-wrap">
+<table className="table w-full">
               {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {trf.map((r, idx) => (
@@ -213,13 +216,15 @@ export default async function QuoteView({ params }) {
                 ))}
               </tbody>
             </table>
+</div>
           </div>
         )}
 
         {act.length > 0 && (
           <div>
             <div className="text-lg font-semibold mb-2">Activities</div>
-            <table className="table w-full">
+            <div className="table-wrap">
+<table className="table w-full">
               {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {act.map((r, idx) => (
@@ -246,6 +251,7 @@ export default async function QuoteView({ params }) {
                 </tr>
               </tfoot>)}
             </table>
+</div>
           </div>
         )}
 

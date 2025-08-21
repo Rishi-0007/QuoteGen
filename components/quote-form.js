@@ -159,7 +159,7 @@ export default function QuoteForm({ initial }) {
 
       {/* 3) Accommodation */}
       <Card>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap">
           <div className="section-title">Accommodation</div>
           <Button type="button" onClick={addAccommodation}>Add Accommodation</Button>
         </div>
@@ -253,7 +253,7 @@ export default function QuoteForm({ initial }) {
       </Card>
 
       <Card>
-        <div className="title mb-2">Display Options</div>
+        <div className="section-title">Display Options</div>
         <div className="grid grid-cols-2 gap-4">
           <label className="flex items-center gap-2"><input type="checkbox" {...form.register("hidePricingColumn")} /><span>Hide pricing column</span></label>
           <label className="flex items-center gap-2"><input type="checkbox" {...form.register("hideGrandTotal")} /><span>Hide grand total</span></label>
