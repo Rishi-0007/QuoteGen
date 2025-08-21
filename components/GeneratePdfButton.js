@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { quoteToHtml } from "@/lib/pdf-template-client";
 export default function GeneratePdfButton({ id }){
+  function sanitizeFileName(name){
+    if(!name) return "quote";
+    const s = name.toString().trim().replace(/[\/:*?\"<>|]+/g, " ");
+    return s.replace(/\s+/g, "_").slice(0,120);
+  }
   const [loading,setLoading]=useState(false);
   async function generate(){
     try{
@@ -11,7 +16,8 @@ export default function GeneratePdfButton({ id }){
       const q = await res.json();
       const html = quoteToHtml(q);
       const html2pdf = (await import("html2pdf.js")).default;
-      const opt = { margin:10, filename:`quote_${id}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
+      const fname = sanitizeFileName(q.agentSubject || q.subject || `quote_${id}`) + ".pdf";
+      const opt = { margin:10, filename: fname, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'portrait'} };
       await html2pdf().from(html).set(opt).save();
     } finally { setLoading(false); }
   }
