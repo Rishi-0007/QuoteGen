@@ -63,6 +63,9 @@ const QuoteSchema = z.object({
   footerBrand: z.string().optional(),
   notesPreset: z.string().optional().default("custom"),
   notesCustom: z.string().optional(),
+
+  hidePricingColumn: z.boolean().optional().default(false),
+  hideGrandTotal: z.boolean().optional().default(false),
 });
 
 export default function QuoteForm({ initial }) {
@@ -73,6 +76,9 @@ export default function QuoteForm({ initial }) {
       footerBrand: initial?.footerBrand ?? "holidays_seychelle",
       notesPreset: initial?.notesPreset ?? "custom",
       notesCustom: initial?.notesCustom ?? "",
+
+      hidePricingColumn: initial?.hidePricingColumn ?? false,
+      hideGrandTotal: initial?.hideGrandTotal ?? false,
 
       agentName: initial?.agentName ?? AGENT_DEFAULT.name,
       agentPhone: initial?.agentPhone ?? AGENT_DEFAULT.phone,
@@ -243,6 +249,14 @@ export default function QuoteForm({ initial }) {
             <option value="oceanic_travel">Traveon</option>
             <option value="sunrise_journeys">Sunrise Journeys (dummy)</option>
           </select>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="title mb-2">Display Options</div>
+        <div className="grid grid-cols-2 gap-4">
+          <label className="flex items-center gap-2"><input type="checkbox" {...form.register("hidePricingColumn")} /><span>Hide pricing column</span></label>
+          <label className="flex items-center gap-2"><input type="checkbox" {...form.register("hideGrandTotal")} /><span>Hide grand total</span></label>
         </div>
       </Card>
 

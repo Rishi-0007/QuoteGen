@@ -13,6 +13,9 @@ export default async function QuoteView({ params }) {
   const quote = await Quotation.findById(id).lean();
   if (!quote) return <div>Not found</div>;
 
+  const hidePricingColumn = !!quote.hidePricingColumn;
+  const hideGrandTotal = !!quote.hideGrandTotal;
+
   // Fallbacks for preview
   const agent = {
     name: quote.agentName || AGENT_DEFAULT.name,
@@ -179,14 +182,14 @@ export default async function QuoteView({ params }) {
           <div>
             <div className="text-lg font-semibold mb-2">Accommodation</div>
             <table className="table w-full">
-              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {acc.map((r, idx) => (
                   <tr key={`acc-${idx}`}>
                     <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
                     <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
-                    <td>{r.date}</td>
-                    <td className="text-right">{r.price}</td>
+                    <td className="text-center whitespace-nowrap w-40">{r.date}</td>
+                    {!hidePricingColumn && (<td className="text-right">{r.price}</td>)}
                   </tr>
                 ))}
               </tbody>
@@ -198,14 +201,14 @@ export default async function QuoteView({ params }) {
           <div>
             <div className="text-lg font-semibold mb-2">Transfers</div>
             <table className="table w-full">
-              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {trf.map((r, idx) => (
                   <tr key={`trf-${idx}`}>
                     <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
                     <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
-                    <td>{r.date}</td>
-                    <td className="text-right">{r.price}</td>
+                    <td className="text-center whitespace-nowrap w-40">{r.date}</td>
+                    {!hidePricingColumn && (<td className="text-right">{r.price}</td>)}
                   </tr>
                 ))}
               </tbody>
@@ -217,18 +220,18 @@ export default async function QuoteView({ params }) {
           <div>
             <div className="text-lg font-semibold mb-2">Activities</div>
             <table className="table w-full">
-              <thead><tr><th>Name</th><th>Details</th><th>Date</th><th className="text-right">Pricing</th></tr></thead>
+              {!hidePricingColumn ? (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th><th className="text-right">Pricing</th></tr></thead>) : (<thead><tr><th>Name</th><th>Details</th><th className="text-center whitespace-nowrap w-40">Date</th></tr></thead>)}
               <tbody>
                 {act.map((r, idx) => (
                   <tr key={`act-${idx}`}>
                     <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
                     <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
-                    <td>{r.date}</td>
-                    <td className="text-right">{r.price}</td>
+                    <td className="text-center whitespace-nowrap w-40">{r.date}</td>
+                    {!hidePricingColumn && (<td className="text-right">{r.price}</td>)}
                   </tr>
                 ))}
               </tbody>
-              <tfoot>
+              {!hideGrandTotal && (<tfoot>
                 <tr>
                   <td colSpan={3} className="text-right">Subtotal</td>
                   <td className="text-right">{formatMoney(quote.subtotal, quote.currency || "INR")}</td>
@@ -241,7 +244,7 @@ export default async function QuoteView({ params }) {
                   <td colSpan={3} className="text-right font-semibold">Grand Total</td>
                   <td className="text-right font-semibold">{formatMoney(quote.grandTotal, quote.currency || "INR")}</td>
                 </tr>
-              </tfoot>
+              </tfoot>)}
             </table>
           </div>
         )}
