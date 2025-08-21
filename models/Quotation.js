@@ -5,6 +5,7 @@ const ItemSchema = new mongoose.Schema({
   type: { type: String, enum: ["accommodation", "transfer", "activity", "other"], default: "other" },
 
   island: String,
+  customIsland: String,
   hotelProperty: String,
   roomCount: Number,
   roomDetails: String,
@@ -14,7 +15,7 @@ const ItemSchema = new mongoose.Schema({
   checkIn: Date,
   checkOut: Date,
 
-  transferType: { type: String, enum: ["airport", "intercity", "ferry"] },
+  transferType: { type: String, enum: ["airport", "intercity", "ferry", "car_rental", "bike_rental", "other"] },
   from: String,
   to: String,
   details: String,
@@ -23,6 +24,18 @@ const ItemSchema = new mongoose.Schema({
   itemTitle: String,
   description: String,
   startDate: Date,
+
+  // Car / Bike rental specific
+  carType: String,
+  bikeType: String,
+  customCarType: String,
+  customBikeType: String,
+  customTransferType: String,
+
+  // Extended timing for rentals
+  endDate: Date,
+  pickupTime: String,
+  dropoffTime: String,
 
   currency: { type: String, default: "INR" },
   basePrice: { type: Number, default: 0 },

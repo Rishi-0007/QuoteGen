@@ -43,14 +43,61 @@ export default async function QuoteView({ params }) {
   const trf = allItems.filter(it => it.type === "transfer").map(it => {
     const cur = it.currency || quote.currency || "INR";
     const total = it.totalPrice ?? (Number(it.basePrice || 0) * (1 + Number(it.markupPercent || 0) / 100));
-    const label = it.transferType === "ferry" ? "Ferry Transfer" : it.transferType === "intercity" ? "Intercity Transfer" : "Airport Transfer";
-    const name = `${label}${it.details ? " - " + it.details : ""}`.trim();
-    const details = `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`;
+    const cancellationNote = it.cancellationBefore ? `Free cancellation before ${new Date(it.cancellationBefore).toLocaleDateString()}` : "";
+    function splitHotelAndLocation(hotelProperty) {
+      if (!hotelProperty) return { name: "", location: "" };
+      const m = hotelProperty.match(/^(.*?)\s*\((.+)\)\s*$/);
+      if (m) return { name: m[1].trim(), location: m[2].trim() };
+      return { name: hotelProperty, location: "" };
+    }
+    let name = "", details = "", date = "", sortTs = it.startDate ? new Date(it.startDate).getTime() : 0;
+    if (it.transferType === "car_rental") {
+      const nm = splitHotelAndLocation(it.carType || it.customCarType || "");
+      name = nm.name || "Car Rental";
+      var subline = nm.location || "";
+      const parts = [];
+      if (it.members || it.members === 0) parts.push(`${it.members} Members`);
+      parts.push(`Pickup ${it.from || ""}${it.pickupTime ? " at " + it.pickupTime : ""}`);
+      if (it.to || it.dropoffTime) parts.push(`Drop-off ${it.to || ""}${it.dropoffTime ? " at " + it.dropoffTime : ""}`);
+      details = parts.filter(Boolean).join(" — ");
+      const d1 = it.startDate ? new Date(it.startDate).toLocaleDateString() : "";
+      const d2 = it.endDate ? new Date(it.endDate).toLocaleDateString() : "";
+      date = [d1, d2].filter(Boolean).join(" - ");
+      sortTs = it.startDate ? new Date(it.startDate).getTime() : (it.endDate ? new Date(it.endDate).getTime() : 0);
+    } else if (it.transferType === "bike_rental") {
+      const nm = splitHotelAndLocation(it.bikeType || it.customBikeType || "");
+      name = nm.name || "Bike Rental";
+      var subline = nm.location || "";
+      const parts = [];
+      if (it.members || it.members === 0) parts.push(`${it.members} Members`);
+      parts.push(`Pickup ${it.from || ""}${it.pickupTime ? " at " + it.pickupTime : ""}`);
+      if (it.to || it.dropoffTime) parts.push(`Drop-off ${it.to || ""}${it.dropoffTime ? " at " + it.dropoffTime : ""}`);
+      details = parts.filter(Boolean).join(" — ");
+      const d1 = it.startDate ? new Date(it.startDate).toLocaleDateString() : "";
+      const d2 = it.endDate ? new Date(it.endDate).toLocaleDateString() : "";
+      date = [d1, d2].filter(Boolean).join(" - ");
+      sortTs = it.startDate ? new Date(it.startDate).getTime() : (it.endDate ? new Date(it.endDate).getTime() : 0);
+    } else if (it.transferType === "other") {
+      var subline = "";
+      name = (it.customTransferType || "Transfer").trim();
+      details = `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`;
+      date = it.startDate ? new Date(it.startDate).toLocaleDateString() : "";
+      sortTs = it.startDate ? new Date(it.startDate).getTime() : 0;
+    } else {
+      var subline = "";
+      const label = it.transferType === "ferry" ? "Ferry Transfer" : it.transferType === "intercity" ? "Intercity Transfer" : "Airport Transfer";
+      name = `${label}${it.details ? " - " + it.details : ""}`.trim();
+      details = `Pickup ${it.from || ""}${it.to ? " to " + it.to : ""}`;
+      date = it.startDate ? new Date(it.startDate).toLocaleDateString() : "";
+      sortTs = it.startDate ? new Date(it.startDate).getTime() : 0;
+    }
     return {
-      _sort: ts(it.startDate),
+      _sort: sortTs,
+      subline,
       name,
       details,
-      date: it.startDate ? new Date(it.startDate).toLocaleDateString() : "",
+      cancel: cancellationNote,
+      date,
       price: formatMoney(total, cur),
     };
   }).sort((a, b) => a._sort - b._sort);
@@ -131,8 +178,8 @@ export default async function QuoteView({ params }) {
               <tbody>
                 {acc.map((r, idx) => (
                   <tr key={`acc-${idx}`}>
-                    <td>{r.name}</td>
-                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
+                    <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
                     <td>{r.date}</td>
                     <td className="text-right">{r.price}</td>
                   </tr>
@@ -150,8 +197,8 @@ export default async function QuoteView({ params }) {
               <tbody>
                 {trf.map((r, idx) => (
                   <tr key={`trf-${idx}`}>
-                    <td>{r.name}</td>
-                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
+                    <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
                     <td>{r.date}</td>
                     <td className="text-right">{r.price}</td>
                   </tr>
@@ -169,8 +216,8 @@ export default async function QuoteView({ params }) {
               <tbody>
                 {act.map((r, idx) => (
                   <tr key={`act-${idx}`}>
-                    <td>{r.name}</td>
-                    <td className="text-white/80">{r.details}</td>
+                    <td>{r.name}{r.subline ? <div className="text-white/60 text-xs">{r.subline}</div> : null}</td>
+                    <td className="text-white/80">{r.details}{r.cancel ? <div className="text-white/50 text-xs mt-1">{r.cancel}</div> : null}</td>
                     <td>{r.date}</td>
                     <td className="text-right">{r.price}</td>
                   </tr>

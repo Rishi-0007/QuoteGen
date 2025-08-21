@@ -35,23 +35,39 @@ export default function AccommodationItem({ index, form }) {
         </SelectNative>
       </div>
 
-      <div>
-        <div className="label">Property</div>
-        <SelectNative
-          {...form.register(`items.${index}.hotelProperty`)}
-          onChange={(e) => {
-            const value = e.target.value;
-            form.setValue(`items.${index}.hotelProperty`, value);
-            if (value !== "Other") form.setValue(`items.${index}.customHotelName`, "");
-          }}
-        >
-          <option value="">Select property</option>
-          {hotels.map((h) => (<option key={h} value={h}>{h}</option>))}
-          <option value="Other">Other</option>
-        </SelectNative>
-      </div>
 
-      {hotelValue === "Other" && (
+      {island === "other" && (
+        <>
+          <div>
+            <div className="label">Enter Island Name</div>
+            <Input {...form.register(`items.${index}.customIsland`)} placeholder="Type island name..." />
+          </div>
+          <div className="md:col-span-2">
+            <div className="label">Enter Hotel / Property Name</div>
+            <Input {...form.register(`items.${index}.hotelProperty`)} placeholder='e.g., "Hotel Name (Location)"' />
+            <div className="text-xs text-white/60 mt-1">Tip: Use <span className="font-mono">Hotel Name (Location)</span> format for auto styling in PDF.</div>
+          </div>
+        </>
+      )}
+      {island !== "other" && (
+        <div>
+          <div className="label">Property</div>
+          <SelectNative
+            {...form.register(`items.${index}.hotelProperty`)}
+            onChange={(e) => {
+              const value = e.target.value;
+              form.setValue(`items.${index}.hotelProperty`, value);
+              if (value !== "Other") form.setValue(`items.${index}.customHotelName`, "");
+            }}
+          >
+            <option value="">Select property</option>
+            {hotels.map((h) => (<option key={h} value={h}>{h}</option>))}
+            <option value="Other">Other</option>
+          </SelectNative>
+        </div>
+      )}
+
+      {island !== "other" && hotelValue === "Other" && (
         <div>
           <div className="label">Enter Hotel Name</div>
           <Input {...form.register(`items.${index}.customHotelName`)} placeholder="Type hotel name..." />

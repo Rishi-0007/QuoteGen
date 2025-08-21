@@ -45,6 +45,7 @@ export default function ActivityItem({ index, form }) {
             form.setValue(`items.${index}.island`, e.target.value);
             form.setValue(`items.${index}.itemTitle`, "");
             form.setValue(`items.${index}.customActivity`, "");
+            if (e.target.value === "other") { form.setValue(`items.${index}.itemTitle`, ""); }
           }}
         >
           <option value="">Select island</option>
@@ -52,21 +53,37 @@ export default function ActivityItem({ index, form }) {
         </SelectNative>
       </div>
 
-      <div>
-        <div className="label">Activity</div>
-        <SelectNative
-          {...form.register(`items.${index}.itemTitle`)}
-          onChange={(e) => {
-            const value = e.target.value;
-            form.setValue(`items.${index}.itemTitle`, value);
-            if (value !== "Other") form.setValue(`items.${index}.customActivity`, "");
-          }}
-        >
-          <option value="">Select activity</option>
-          {options.map(a => <option key={a} value={a}>{a}</option>)}
-          <option value="Other">Other</option>
-        </SelectNative>
-      </div>
+
+      {island === "other" && (
+        <>
+          <div>
+            <div className="label">Enter Island Name</div>
+            <Input {...form.register(`items.${index}.customIsland`)} placeholder="Type island name..." />
+          </div>
+          <div className="md:col-span-2">
+            <div className="label">Enter Activity Name</div>
+            <Input {...form.register(`items.${index}.itemTitle`)} placeholder="Type activity name..." />
+          </div>
+        </>
+      )}
+      {island !== "other" && (
+        <div>
+          <div className="label">Activity</div>
+          <SelectNative
+            {...form.register(`items.${index}.itemTitle`)}
+            onChange={(e) => {
+              const value = e.target.value;
+              form.setValue(`items.${index}.itemTitle`, value);
+              if (value !== "Other") form.setValue(`items.${index}.customActivity`, "");
+              if (e.target.value === "other") { form.setValue(`items.${index}.itemTitle`, ""); }
+            }}
+          >
+            <option value="">Select activity</option>
+            {options.map(a => <option key={a} value={a}>{a}</option>)}
+            <option value="Other">Other</option>
+          </SelectNative>
+        </div>
+      )}
 
       {activityValue === "Other" && (
         <div>
